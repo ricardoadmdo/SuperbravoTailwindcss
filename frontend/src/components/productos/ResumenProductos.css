@@ -1,0 +1,64 @@
+/* Ajustes generales para tablas */
+.custom-table {
+	width: 100%;
+	table-layout: auto; /* Permite ajustes dinámicos */
+	font-size: 0.9rem;
+	border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+	text-align: center;
+	vertical-align: middle;
+	padding: 6px;
+	word-wrap: break-word; /* Ajusta el texto */
+	overflow: hidden;
+	text-overflow: ellipsis; /* Elimina cortes visuales */
+}
+
+/* Estilos para impresión y PDF */
+@media print {
+	body {
+		margin: 0;
+		padding: 0;
+	}
+
+	.container {
+		width: 100%;
+	}
+
+	.custom-table {
+		width: 100%;
+		font-size: 0.7rem;
+	}
+
+	.custom-table th,
+	.custom-table td {
+		padding: 4px;
+		word-wrap: break-word;
+	}
+
+	.table-responsive {
+		overflow: visible !important;
+	}
+
+	.text-end,
+	button {
+		display: none;
+	}
+}
+
+/* Ajustes específicos para exportar a PDF */
+.pdf-view .custom-table {
+	font-size: 0.8rem; /* Tamaño para el PDF */
+	word-wrap: break-word; /* Ajuste dinámico del texto */
+}
+
+.pdf-view .custom-table th,
+.pdf-view .custom-table td {
+	padding: 5px; /* Espaciado uniforme */
+}
+
+.pdf-view .table-responsive {
+	overflow: visible; /* Desactiva scroll */
+}

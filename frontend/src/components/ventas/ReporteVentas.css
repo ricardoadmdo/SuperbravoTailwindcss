@@ -1,0 +1,16 @@
+.report-ventas__table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Mejora la experiencia en dispositivos iOS */
+  }
+  
+  .report-ventas__table {
+    min-width: 800px; /* Asegura que la tabla tenga un ancho adecuado */
+  }
+  
+  @media (max-width: 768px) {
+    .report-ventas__table-container {
+      margin-left: -15px;
+      margin-right: -15px;
+    }
+  }
+  

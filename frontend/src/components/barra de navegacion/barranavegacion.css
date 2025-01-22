@@ -1,0 +1,106 @@
+/* General Styles */
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+}
+
+.sidebar {
+	width: 0;
+	overflow: hidden;
+	transition: width 0.3s;
+	position: fixed;
+	top: 56px; /* Offset for the horizontal navbar */
+	left: 0;
+	height: 100%;
+	z-index: 1000; /* Ensure sidebar is above other elements */
+	background-color: #343a40; /* Dark background for sidebar */
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Shadow effect */
+	border-top-right-radius: 10px; /* Rounded corner */
+	border-bottom-right-radius: 10px; /* Rounded corner */
+}
+
+.sidebar.open {
+	width: 250px;
+}
+
+.bg-aqua {
+	background-color: #66c4e0;
+}
+
+.menu-btn {
+	font-size: 24px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	margin-right: 10px;
+	color: #fff; /* White color for menu button */
+}
+
+.logo {
+	width: 50px; /* Smaller logo */
+}
+
+.logo-navbar {
+	width: 30px; /* Smaller logo in the navbar */
+	margin-right: 10px; /* Space between logo and text */
+}
+
+.nav-link {
+	color: #fff !important; /* White color with higher priority */
+	font-size: 18px;
+	text-decoration: none;
+	padding: 10px 15px; /* Padding for better click area */
+	border-radius: 5px; /* Rounded corners */
+	transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.nav-link:hover {
+	background-color: #495057; /* Slightly lighter background on hover */
+	color: #fff !important; /* Ensure hover color remains white */
+}
+
+.navbar {
+	z-index: 999; /* Ensure navbar is above other elements */
+	transition: margin-left 0.3s; /* Smooth transition for shifting content */
+	background-color: #343a40; /* Dark background for navbar */
+	color: #fff; /* White color for navbar text */
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Shadow effect */
+}
+
+.content {
+	transition: margin-left 0.3s; /* Smooth transition for shifting content */
+	margin-left: 0;
+	padding: 20px; /* Padding for content */
+}
+
+.content.shifted {
+	margin-left: 250px;
+}
+
+/* Additional Styles */
+.navbar-brand {
+	color: #fff !important; /* White color for brand text */
+	font-weight: bold;
+}
+
+.navbar-brand img {
+	margin-right: 10px;
+}
+
+.navbar-collapse {
+	justify-content: flex-end; /* Align links to the right */
+}
+
+.navbar .nav-link {
+	color: #fff !important; /* White color for navbar links */
+}
+
+.navbar .nav-link:hover {
+	background-color: #495057; /* Slightly lighter background on hover */
+}
+
+@font-face {
+	font-family: 'CustomFont';
+	src: url('/path/to/font.woff2') format('woff2');
+	font-display: swap;
+}
