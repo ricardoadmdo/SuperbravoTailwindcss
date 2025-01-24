@@ -10,23 +10,41 @@ import {
 	faBoxes,
 	faUserCog,
 	faChartLine,
+	faSun,
+	faMoon,
 } from "@fortawesome/free-solid-svg-icons";
-import useAuthStore from "../../auth/authStore"; // Importa la store de Zustand
+import useAuthStore from "../../auth/authStore";
+import PropTypes from "prop-types";
 
-const Barranavegacion = () => {
+const Barranavegacion = ({ darkMode, setDarkMode }) => {
 	const navigate = useNavigate();
 	const { user, logout } = useAuthStore();
 	const [isOpen, setIsOpen] = useState(false);
+
 	const sidebarRef = useRef(null);
 	const buttonRef = useRef(null);
+
+	useEffect(() => {
+		if (darkMode) {
+			document.documentElement.classList.add("dark");
+			localStorage.setItem("theme", "dark");
+		} else {
+			document.documentElement.classList.remove("dark");
+			localStorage.setItem("theme", "light");
+		}
+	}, [darkMode]);
+
+	const toggleSidebar = () => {
+		setIsOpen(!isOpen);
+	};
+
+	const toggleDarkMode = () => {
+		setDarkMode(!darkMode);
+	};
 
 	const handleLogout = () => {
 		logout(); // Llama a la acción logout de Zustand
 		navigate("/", { replace: true });
-	};
-
-	const toggleSidebar = () => {
-		setIsOpen(!isOpen);
 	};
 
 	const handleClickOutside = (event) => {
@@ -61,6 +79,13 @@ const Barranavegacion = () => {
 					</span>
 
 					<ul className="navbar-nav">
+						{/* Botón para alternar modo oscuro */}
+						<li className="nav-item me-3">
+							<button onClick={toggleDarkMode} className="btn btn-sm text-light bg-transparent">
+								<FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
+							</button>
+						</li>
+
 						{user.logged ? (
 							<li className="nav-item">
 								<span>{user.nombre}</span>
@@ -143,6 +168,11 @@ const Barranavegacion = () => {
 			<div className={`content ${isOpen ? "shifted" : ""}`}></div>
 		</>
 	);
+};
+
+Barranavegacion.propTypes = {
+	darkMode: PropTypes.bool.isRequired,
+	setDarkMode: PropTypes.func.isRequired,
 };
 
 export default Barranavegacion;

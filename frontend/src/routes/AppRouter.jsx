@@ -20,12 +20,13 @@ import ProductosVendidos from "../components/ProductosVendidos";
 import HistorialCompleto from "../components/HistorialCompleto";
 import GraficoProductosPorFecha from "../components/ventas/GraficoProductosFecha";
 import LoginPage from "../pages/LoginPage";
+import PropTypes from "prop-types";
 
-const AppRouter = () => {
+const AppRouter = ({ darkMode, setDarkMode }) => {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route element={<LayoutWithNav />}>
+				<Route element={<LayoutWithNav darkMode={darkMode} setDarkMode={setDarkMode} />}>
 					<Route
 						path="/reporte-venta"
 						element={
@@ -180,12 +181,22 @@ const AppRouter = () => {
 	);
 };
 
-const LayoutWithNav = () => (
+AppRouter.propTypes = {
+	darkMode: PropTypes.bool.isRequired,
+	setDarkMode: PropTypes.func.isRequired,
+};
+
+const LayoutWithNav = ({ darkMode, setDarkMode }) => (
 	<>
-		<Barranavegacion />
+		<Barranavegacion darkMode={darkMode} setDarkMode={setDarkMode} />
 		<Outlet />
 		<Footer />
 	</>
 );
+
+LayoutWithNav.propTypes = {
+	darkMode: PropTypes.bool.isRequired,
+	setDarkMode: PropTypes.func.isRequired,
+};
 
 export default AppRouter;
