@@ -1,22 +1,22 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Pagination from "../ui/Pagination";
 import Swal from "sweetalert2";
 import "../ventas/ReporteVentas.css";
-import { AuthContext } from "../../auth/authContext";
 import ReporteVentasSkeleton from "./ReportedeVentaSkeleton";
 import Estadisticas from "./Estadisticas";
 import TablaVentas from "./TablaVentas";
 import { calcularEstadisticas, useVentasGlobales, useVentasPaginadas } from "../../hooks/ventasHooks";
 import GananciaGestores from "./GananciaGestores";
+import useAuthStore from "../../auth/authStore";
 
 const ReporteVentas = () => {
 	const [startDate, setStartDate] = useState(new Date());
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
 	const [searchInput, setSearchInput] = useState("");
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthStore();
 
 	const { ventas, totalPages, isLoading, isError, eliminarVenta } = useVentasPaginadas(
 		startDate,

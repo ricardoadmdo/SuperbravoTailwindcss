@@ -1,8 +1,6 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../auth/authContext";
 import "./barranavegacion.css";
-import { types } from "../../types/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faUser,
@@ -13,16 +11,17 @@ import {
 	faUserCog,
 	faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
+import useAuthStore from "../../auth/authStore"; // Importa la store de Zustand
 
 const Barranavegacion = () => {
-	const { user, dispatch } = useContext(AuthContext);
 	const navigate = useNavigate();
+	const { user, logout } = useAuthStore();
 	const [isOpen, setIsOpen] = useState(false);
 	const sidebarRef = useRef(null);
 	const buttonRef = useRef(null);
 
 	const handleLogout = () => {
-		dispatch({ type: types.logout });
+		logout(); // Llama a la acción logout de Zustand
 		navigate("/", { replace: true });
 	};
 

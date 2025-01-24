@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef, useContext } from "react";
+import { useEffect, useState, useRef } from "react";
 import Axios from "../../api/axiosConfig";
 import ProductSkeleton from "./ProductSkeleton";
 import ErrorComponent from "../ui/ErrorComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import html2pdf from "html2pdf.js";
-import { AuthContext } from "../../auth/authContext";
 import "./ResumenProductos.css";
+import useAuthStore from "../../auth/authStore";
 
 const fetchProductos = async () => {
 	const response = await Axios.get(`/productos/all`);
@@ -14,7 +14,7 @@ const fetchProductos = async () => {
 };
 
 const ResumenProductos = () => {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthStore();
 	const [productosData, setProductosData] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isError, setIsError] = useState(false);
@@ -93,11 +93,6 @@ const ResumenProductos = () => {
 		0
 	);
 	const totalCostoInventario = productosList.reduce((acc, producto) => acc + producto.costo * producto.existencia, 0);
-	const totalVentaInventario = productosList.reduce((acc, producto) => acc + producto.venta * producto.existencia, 0);
-	const totalVentaInventarioSinGestor = productosList.reduce(
-		(acc, producto) => acc + producto.venta * producto.existencia - producto.precioGestor * producto.existencia,
-		0
-	);
 	const totalGestor = productosList.reduce((acc, producto) => acc + producto.precioGestor * producto.existencia, 0);
 
 	return (

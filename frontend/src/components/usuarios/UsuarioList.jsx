@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import Axios from "../../api/axiosConfig";
 import Swal from "sweetalert2";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,7 +9,7 @@ import UsuariosSkeleton from "./UsuariosSkeleton";
 import ErrorComponent from "../ui/ErrorComponent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchUsuarios } from "../../api/fetchData";
-import { AuthContext } from "../../auth/authContext";
+import useAuthStore from "../../auth/authStore";
 
 const useUsuarios = (page, limit) => {
 	return useQuery({
@@ -25,7 +25,7 @@ const useUsuarios = (page, limit) => {
 };
 
 const UsuarioList = () => {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthStore();
 	const queryClient = useQueryClient();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [limit] = useState(8);

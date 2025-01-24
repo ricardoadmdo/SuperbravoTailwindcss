@@ -1,18 +1,17 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../../api/axiosConfig";
 import Swal from "sweetalert2";
-import { AuthContext } from "../../auth/authContext";
 import "./login.css";
 import background from "../../images/login.jpg";
-import { types } from "../../types/types";
+import useAuthStore from "./auth/authStore";
 
 const Login = () => {
 	const [usuario, setUsername] = useState("");
 	const [contrasena, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false); // Estado para el loading
 	const navigate = useNavigate();
-	const { dispatch } = useContext(AuthContext);
+	const { login } = useAuthStore();
 
 	const handleLogin = async () => {
 		setIsLoading(true); // Activa el spinner
@@ -23,14 +22,11 @@ const Login = () => {
 			});
 
 			if (response.data.success) {
-				const action = {
-					type: types.login,
-					payload: {
-						nombre: response.data.nombre,
-						rol: response.data.rol,
-					},
-				};
-				dispatch(action);
+				// Llama a la acción login de Zustand
+				login({
+					nombre: response.data.nombre,
+					rol: response.data.rol,
+				});
 				navigate("/agregar-venta");
 				Swal.fire({
 					toast: true,
@@ -71,35 +67,6 @@ const Login = () => {
 			setIsLoading(false); // Desactiva el spinner
 		}
 	};
-
-	// const createAdmin = async () => {
-	// 	try {
-	// 		const response = await Axios.post("/auth/create-admin", {
-	// 			usuario: import.meta.env.VITE_USUARIO,
-	// 			contrasena: import.meta.env.VITE_PASSWORD,
-	// 			nombre: "Administrador",
-	// 			rol: "Administrador",
-	// 		});
-
-	// 		if (response.data.success) {
-	// 			Swal.fire({
-	// 				title: "Éxito",
-	// 				text: "Administrador creado con éxito",
-	// 				icon: "success",
-	// 				confirmButtonText: "Aceptar",
-	// 			});
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("Error:", error);
-
-	// 		Swal.fire({
-	// 			title: "Alerta",
-	// 			text: "El usuario administrador ya ha sido creado, por favor contactar al administrador",
-	// 			icon: "warning",
-	// 			confirmButtonText: "Aceptar",
-	// 		});
-	// 	}
-	// };
 
 	return (
 		<div
