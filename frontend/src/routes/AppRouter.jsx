@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import Login from "../components/login/Login";
 import Barranavegacion from "../components/barra de navegacion/Barranavegacion";
 import AgregarVenta from "../components/ventas/AgregarVenta";
 import ProductForm from "../components/productos/ProductForm";
@@ -20,6 +19,7 @@ import GraficoProductoMasVendidoDiario from "../components/ventas/GraficoProduct
 import ProductosVendidos from "../components/ProductosVendidos";
 import HistorialCompleto from "../components/HistorialCompleto";
 import GraficoProductosPorFecha from "../components/ventas/GraficoProductosFecha";
+import LoginPage from "../pages/LoginPage";
 
 const AppRouter = () => {
 	return (
@@ -172,7 +172,7 @@ const AppRouter = () => {
 						}
 					/>
 				</Route>
-				<Route path="/" element={<Login />} />
+				<Route path="/" element={<LoginPage />} />
 				{/* Ruta comodín para manejar rutas no existentes */}
 				<Route path="*" element={<Error404 />} />
 			</Routes>
