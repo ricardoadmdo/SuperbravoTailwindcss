@@ -1,6 +1,7 @@
-const { response, request } = require("express");
 const Producto = require("../models/producto");
 const Historial = require("../models/historial");
+const fs = require("fs");
+const path = require("path");
 
 const productosGet = async (req, res) => {
 	try {
@@ -66,7 +67,18 @@ const productosBuscar = async (req, res) => {
 };
 
 const productosPost = async (req, res) => {
-	const { nombre, codigo, descripcion, existencia, costo, venta, url, precioGestor } = req.body;
+	const { nombre, codigo, descripcion, existencia, costo, venta, precioGestor } = req.body;
+
+	// Verifica si se subió una imagen
+	const file = req.file;
+	if (!file) {
+		return res.status(400).json({
+			error: "Es obligatorio subir una imagen para el producto.",
+		});
+	}
+
+	// Genera la URL de la imagen
+	const url = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
 
 	try {
 		const newProducto = new Producto({
@@ -76,8 +88,8 @@ const productosPost = async (req, res) => {
 			existencia,
 			costo,
 			venta,
-			url,
 			precioGestor,
+			url,
 		});
 
 		await newProducto.save();
@@ -98,10 +110,9 @@ const productosPost = async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 };
-
 const productosPut = async (req, res) => {
 	const { id } = req.params;
-	const { nombre, codigo, descripcion, existencia, costo, venta, url, precioGestor } = req.body;
+	const { nombre, codigo, descripcion, existencia, costo, venta, precioGestor } = req.body;
 
 	try {
 		// Verificar si el producto existe
@@ -110,9 +121,15 @@ const productosPut = async (req, res) => {
 			return res.status(404).json({ msg: "Producto no encontrado" });
 		}
 
-		// Guardar valores anteriores para el registro en el historial
-		const cambios = [];
+		// Determinar si se subió una nueva imagen
+		let url = productoExistente.url;
+		const file = req.file; // Multer almacena el archivo en `req.file`
+		if (file) {
+			url = `/uploads/${file.filename}`;
+		}
 
+		// Guardar valores anteriores para el historial
+		const cambios = [];
 		if (nombre !== undefined && nombre !== productoExistente.nombre) {
 			cambios.push(`Nombre: ${productoExistente.nombre} -> ${nombre}`);
 		}
@@ -125,17 +142,20 @@ const productosPut = async (req, res) => {
 		if (venta !== undefined && venta !== productoExistente.venta) {
 			cambios.push(`Venta: ${productoExistente.venta} -> ${venta}`);
 		}
+		if (file) {
+			cambios.push(`URL de la imagen actualizada a ${url}`);
+		}
 
 		// Actualizar los campos del producto
 		const camposActualizados = {
-			nombre: nombre !== undefined ? nombre : productoExistente.nombre,
-			codigo: codigo !== undefined ? codigo : productoExistente.codigo,
-			descripcion: descripcion !== undefined ? descripcion : productoExistente.descripcion,
-			existencia: existencia !== undefined ? existencia : productoExistente.existencia,
-			costo: costo !== undefined ? costo : productoExistente.costo,
-			venta: venta !== undefined ? venta : productoExistente.venta,
-			precioGestor: precioGestor !== undefined ? precioGestor : productoExistente.precioGestor,
-			url: url !== undefined ? url : productoExistente.url,
+			nombre: nombre ?? productoExistente.nombre,
+			codigo: codigo ?? productoExistente.codigo,
+			descripcion: descripcion ?? productoExistente.descripcion,
+			existencia: existencia ?? productoExistente.existencia,
+			costo: costo ?? productoExistente.costo,
+			venta: venta ?? productoExistente.venta,
+			precioGestor: precioGestor ?? productoExistente.precioGestor,
+			url,
 		};
 
 		// Guardar los cambios en la base de datos
@@ -152,7 +172,6 @@ const productosPut = async (req, res) => {
 			await historial.save();
 		}
 
-		// Responder con el producto actualizado
 		res.status(200).json(productoActualizado);
 	} catch (error) {
 		console.error("Error al actualizar producto:", error);
@@ -182,9 +201,21 @@ const productoDelete = async (req, res) => {
 			return res.status(404).json({ msg: "Producto no encontrado" });
 		}
 
+		// Extraer la parte relativa de la URL
+		const relativePath = producto.url.replace(`${req.protocol}://${req.get("host")}`, "");
+
+		// Ruta absoluta del archivo
+		const filePath = path.join(__dirname, "../", relativePath);
+
+		// Verificar si el archivo existe y eliminarlo
+		if (fs.existsSync(filePath)) {
+			fs.unlinkSync(filePath); // Elimina el archivo
+		}
+
 		// Eliminar el producto de la colección
 		await producto.deleteOne();
-		res.status(200).json({ msg: "Producto eliminado" });
+
+		res.status(200).json({ msg: "Producto eliminado y su imagen asociada también." });
 	} catch (error) {
 		console.error("Error al eliminar producto:", error);
 		res.status(500).json({ error: error.message });

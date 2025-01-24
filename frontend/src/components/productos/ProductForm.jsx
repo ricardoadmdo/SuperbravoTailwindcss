@@ -5,9 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import { FaUpload } from "react-icons/fa"; // Import an icon
 
-const cloudName = import.meta.env.VITE_CLOUDNAME;
-const uploadPreset = import.meta.env.VITE_UPLOADPRESET;
-
 const ProductForm = () => {
 	const [nombre, setNombre] = useState("");
 	const [codigo, setCodigo] = useState("");
@@ -16,7 +13,7 @@ const ProductForm = () => {
 	const [costo, setCosto] = useState("");
 	const [venta, setVenta] = useState("");
 	const [precioGestor, setPrecioGestor] = useState("");
-	const [url, setUrl] = useState("");
+	const [, setUrl] = useState("");
 	const [file, setFile] = useState(null);
 	const [editar, setEditar] = useState(false);
 	const [uploading, setUploading] = useState(false); // State to manage uploading
@@ -53,45 +50,39 @@ const ProductForm = () => {
 			});
 	};
 
-	const uploadImageToCloudinary = async () => {
-		setUploading(true); // Set uploading state to true
-		const formData = new FormData();
-		formData.append("file", file);
-		formData.append("upload_preset", uploadPreset);
-
-		try {
-			const response = await Axios.post(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, formData);
-			setUploading(false); // Set uploading state to false
-			return response.data.secure_url;
-		} catch (error) {
-			setUploading(false); // Set uploading state to false
+	const add = async () => {
+		if (!file) {
 			Swal.fire({
 				title: "Error",
-				text: "Hubo un error al subir la imagen.",
+				text: "Debe seleccionar una imagen antes de guardar.",
 				icon: "error",
 				confirmButtonText: "Aceptar",
 			});
-			return null;
+			return;
 		}
-	};
 
-	const add = async () => {
-		let imageUrl = url;
-		if (file) {
-			imageUrl = await uploadImageToCloudinary();
-		}
+		setUploading(true);
+
+		// Crear el objeto FormData
+		const formData = new FormData();
+		formData.append("file", file); // Imagen
+		formData.append("nombre", nombre);
+		formData.append("codigo", codigo);
+		formData.append("descripcion", descripcion);
+		formData.append("existencia", existencia);
+		formData.append("costo", costo);
+		formData.append("venta", venta);
+		formData.append("precioGestor", precioGestor);
 
 		try {
-			await Axios.post("/productos", {
-				nombre,
-				codigo,
-				descripcion,
-				existencia,
-				costo,
-				venta,
-				precioGestor,
-				url: imageUrl,
+			// Hacer la solicitud POST al backend
+			await Axios.post("/productos", formData, {
+				headers: {
+					"Content-Type": "multipart/form-data", // Especificar que se envía un archivo
+				},
 			});
+
+			setUploading(false);
 			navigate("/gestionar-productos");
 			Swal.fire({
 				toast: true,
@@ -113,6 +104,7 @@ const ProductForm = () => {
 				},
 			});
 		} catch (error) {
+			setUploading(false);
 			console.error("Error al registrar el producto:", error);
 			Swal.fire({
 				icon: "error",
@@ -129,40 +121,39 @@ const ProductForm = () => {
 	};
 
 	const update = async () => {
-		let imageUrl = url;
+		const formData = new FormData();
+		formData.append("nombre", nombre);
+		formData.append("codigo", codigo);
+		formData.append("descripcion", descripcion);
+		formData.append("existencia", existencia);
+		formData.append("costo", costo);
+		formData.append("venta", venta);
+		formData.append("precioGestor", precioGestor);
+
 		if (file) {
-			imageUrl = await uploadImageToCloudinary();
+			formData.append("file", file); // Añadir el archivo solo si existe
 		}
 
 		try {
-			await Axios.put(`/productos/${id}`, {
-				nombre,
-				codigo,
-				descripcion,
-				existencia,
-				costo,
-				venta,
-				precioGestor,
-				url: imageUrl,
+			await Axios.put(`/api/productos/${id}`, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
 			});
+
 			navigate("/gestionar-productos");
 			Swal.fire({
 				toast: true,
 				position: "top-end",
 				icon: "success",
 				title: "¡Actualización exitosa!",
-				text: `El producto "${nombre}" se ha actualizado con éxito📦🔄.`,
+				text: `El producto "${nombre}" se ha actualizado con éxito 📦🔄.`,
 				showConfirmButton: false,
 				timer: 3000,
 				timerProgressBar: true,
 				didOpen: (toast) => {
 					toast.addEventListener("mouseenter", Swal.stopTimer);
 					toast.addEventListener("mouseleave", Swal.resumeTimer);
-				},
-				customClass: {
-					popup: "swal-popup-success",
-					title: "swal-title",
-					text: "swal-content",
 				},
 			});
 		} catch (error) {
@@ -172,17 +163,23 @@ const ProductForm = () => {
 				title: "Error al actualizar",
 				text: "No se pudo actualizar el producto. Por favor, intente de nuevo.",
 				confirmButtonText: "Aceptar",
-				customClass: {
-					popup: "swal-popup-error",
-					title: "swal-title-error",
-					text: "swal-content-error",
-				},
 			});
 		}
 	};
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
+
+		if (!editar && !file) {
+			Swal.fire({
+				title: "Error",
+				text: "Debe seleccionar una imagen antes de guardar.",
+				icon: "error",
+				confirmButtonText: "Aceptar",
+			});
+			return;
+		}
+
 		if (editar) {
 			update();
 		} else {
@@ -296,14 +293,17 @@ const ProductForm = () => {
 									<label className="form-label">Imagen del Producto</label>
 									<div {...getRootProps({ className: "dropzone border p-4 text-center" })}>
 										<input {...getInputProps()} />
-										<FaUpload className="mb-2" size={50} color="#007BFF" /> {/* Image icon */}
+										<FaUpload className="mb-2" size={50} color="#007BFF" />
 										<p>
 											{file
 												? `Archivo seleccionado: ${file.name}`
 												: "Arrastra una imagen o haz clic para seleccionarla"}
 										</p>
 									</div>
-									{uploading && <p className="text-dark">Subiendo imagen, por favor espera...</p>}{" "}
+									{!file && <p className="text-danger">No se ha seleccionado ninguna imagen.</p>}
+									{uploading && (
+										<p className="text-dark">Subiendo imagen, por favor espera...</p>
+									)}{" "}
 									{/* Loading message */}
 								</div>
 
