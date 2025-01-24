@@ -4,7 +4,7 @@ import Axios from "../../api/axiosConfig";
 import Swal from "sweetalert2";
 import "./login.css";
 import background from "../../images/login.jpg";
-import useAuthStore from "./auth/authStore";
+import useAuthStore from "../../auth/authStore";
 
 const Login = () => {
 	const [usuario, setUsername] = useState("");
