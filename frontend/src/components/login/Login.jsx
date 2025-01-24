@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../../api/axiosConfig";
 import Swal from "sweetalert2";
-import "./login.css";
 import background from "../../images/login.jpg";
 import useAuthStore from "../../auth/authStore";
 
